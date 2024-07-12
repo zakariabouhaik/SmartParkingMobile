@@ -36,9 +36,9 @@ export default function App() {
   const createTransaction = async () => {
     try {
       const [barCodeCardId, porte, heureEntree] = barcodeData.split(',');
-      const clientId = '83a72242-aa44-47ec-8067-73c39eddcb1c'; 
+      const clientId = 'd63f77e9-e3c4-476e-bf7d-fe0627c9522b'; 
 
-      const response = await fetch(`http://16.171.20.170:8080/Transaction/${clientId}/${barCodeCardId}`, {
+      await fetch(`http://16.171.20.170:8080/Transaction/${clientId}/${barCodeCardId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,19 +47,25 @@ export default function App() {
           porte: porte,
           heureEntree: heureEntree
         }),
+      }).then(resp => {
+        console.log("----resp-->",resp);
+        
+        resp.json().then(data => {
+          console.log("data---->",data);
+          if(resp.status !== 201){
+            alert(data.message);
+          } else {
+            setTransaction(data);
+            setShowModal(true);
+          }        
+        })
+      }).catch (error =>  {
+        alert('Failed to create transaction. Please try again.');
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+    } catch(err){
+      console.error('Error creating transaction');
       }
-
-      const createdTransaction = await response.json();
-      setTransaction(createdTransaction);
-      setShowModal(true);
-    } catch (error) {
-      console.error('Error creating transaction:', error);
-      alert('Failed to create transaction. Please try again.');
-    }
   };
 
   if (hasPermission === null) {
