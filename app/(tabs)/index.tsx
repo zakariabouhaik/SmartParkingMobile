@@ -36,9 +36,9 @@ export default function App() {
   const createTransaction = async () => {
     try {
       const [barCodeCardId, porte, heureEntree] = barcodeData.split(',');
-      const clientId = 'd63f77e9-e3c4-476e-bf7d-fe0627c9522b'; 
+      const clientId = '8a6e52fd-2dda-48dd-966a-8816cefe78b2'; 
 
-      await fetch(`http://16.171.20.170:8080/Transaction/${clientId}/${barCodeCardId}`, {
+      const response= await fetch(`http://16.171.20.170:8080/Transaction/${clientId}/${barCodeCardId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,27 +47,34 @@ export default function App() {
           porte: porte,
           heureEntree: heureEntree
         }),
-      }).then(resp => {
-        console.log("----resp-->",resp);
-        
-        resp.json().then(data => {
-          console.log("data---->",data);
-          if(resp.status !== 201){
-            alert(data.message);
-          } else {
-            setTransaction(data);
-            setShowModal(true);
-          }        
-        })
-      }).catch (error =>  {
-        alert('Failed to create transaction. Please try again.');
       });
 
-    } catch(err){
-      console.error('Error creating transaction');
+      const data = await response.json();
+  
+      if (!response.ok) {
+        // If the response is not OK, throw an error with the message from the server
+        throw new Error(data.message || 'Failed to create transaction');
       }
+  
+      setTransaction(data);
+      setShowModal(true);
+  
+    } catch (error: unknown) {
+      console.error('Error creating transaction:', error);
+      
+      let errorMessage = 'Failed to create transaction. Please try again.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null && 'message' in error) {
+        errorMessage = String(error.message);
+      }
+  
+      alert(errorMessage);
+    }
   };
 
+  
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
