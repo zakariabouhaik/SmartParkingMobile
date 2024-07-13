@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button, Modal, TouchableOpacity } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 interface Transaction {
   id: string;
@@ -35,8 +36,8 @@ export default function App() {
 
   const createTransaction = async () => {
     try {
-      const [barCodeCardId, porte, heureEntree] = barcodeData.split(',');
-      const clientId = '8a6e52fd-2dda-48dd-966a-8816cefe78b2'; 
+      const barCodeCardId = barcodeData;
+      const clientId = 'bf6a8a0d-f9ab-44dd-95f8-29cb877fd2d9'; 
 
       const response= await fetch(`http://16.171.20.170:8080/Transaction/${clientId}/${barCodeCardId}`, {
         method: 'POST',
@@ -44,8 +45,7 @@ export default function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          porte: porte,
-          heureEntree: heureEntree
+          
         }),
       });
 
